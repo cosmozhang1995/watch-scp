@@ -1,0 +1,8 @@
+host = "162.105.250.69"
+username = "cosmo"
+# password = "cosmo"
+sshkey = "~/.ssh/id_rsa"
+srcPath = "/Users/cosmozhang/tmp/test"
+destPath = "/home/cosmo/tmp/test"
+ignore = "node_modules|hehe"
+interval = 0.1

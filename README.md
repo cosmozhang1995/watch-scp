@@ -1,20 +1,13 @@
 # watch-scp
-监控文件改变，然后scp到服务器
+Watch file changes in a directory, and use scp to synchronize to remote.
 
-#如何启动
+# Start up
 
-根据自己的服务器来进行配置
-cp config_template.js config.js
+## make config file
+cp config.example.toml config.toml
 
-安装依赖包
+## install dependencies
 npm install
 
-启动
+## start
 npm run start
-
-#说明
-只是监控文件改变才会上传
-
-文件新建和删除不进行监控，需要自己手动操作
-
-但是文件新建完，然后做修改会自动上传到自定目录上

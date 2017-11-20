@@ -1,48 +1,66 @@
 /*
  * @Author: jade
  * @Date:   2016-08-09 22:59:16
- * @Last Modified by:   jade
- * @Last Modified time: 2016-08-10 15:08:09
+ * @Last Modified by:   Cosmo
+ * @Last Modified time: 2017-11-20 17:48:00
  */
 
 'use strict';
-var watch = require('watch');
 var client = require('scp2');
-const config = require('./config.js');
-require('set-iterm2-badge')(`WATCH:${config.srcPath}`);
-/**
- * [description]
- * @param  {[type]} monitor) {                   monitor.on("created", function(f, stat) {                console.log(`created:${stat}`)    })    monitor.on("changed", function(f, curr, prev) {                console.log(f);        const destPath [description]
- * @return {[type]}          [description]
- * 该功能主要是监控已经存在的文件，然后上传到自己的服务器上
- */
-watch.createMonitor(config.srcPath, {
-    // interval: 0.05,
-    ignoreDotFiles: true,
-    ignoreDirectoryPattern: config.ignoreDirectoryPattern
+var homedir = require('os').homedir();
+
+var configFilePath = "./scp.toml";
+var args = process.argv;
+if (args[0].match(/node$/)) args = args.slice(2);
+else args = args.slice(1);
+for (var i = 0; i < args.length; i++) {
+  if (args[i] == "-c" || args[i] == "--config") {
+    configFilePath = args[++i];
+  }
+}
+
+const config = (function(path) {
+  var obj = require('fs').readFileSync(configFilePath.replace(/^\~/, homedir)).toString();
+  obj = require('toml').parse(obj);
+  if (obj.ignore) obj.ignore = new RegExp(obj.ignore);
+  if (obj.sshkey) obj.sshkey = require('fs').readFileSync(obj.sshkey.replace(/^\~/, homedir)).toString();
+  return obj
+})(configFilePath);
+
+require('watch').createMonitor(config.srcPath, {
+  interval: config.interval,
+  ignoreDotFiles: true,
+  ignoreDirectoryPattern: config.ignore
 }, function(monitor) {
-    // monitor.files['/home/mikeal/.zshrc'] // Stat object for my zshrc.
-    monitor.on("created", function(f, stat) {
-        // Handle new files
-        console.log(`created:${stat}`)
-    })
-    monitor.on("changed", function(f, curr, prev) {
-        // Handle file changes
-        const destPath = f.replace(config.srcPath, '');
-        config.path = config.destPath + destPath;
-        client.scp(f, config, function(err) {
-            if(err){
-                console.error(`上传失败：${f}`);
-                console.error(err);
-            }else{
-                console.info(`成功上传：${f}->${config.path}`);
-            }
-            
-        })
-    })
-    monitor.on("removed", function(f, stat) {
-            // Handle removed files
-            console.log(`removed:${stat}`)
-        })
-        // monitor.stop(); // Stop watching
-})
+  monitor.on("created", function(f, stat) {
+    console.log(`[Created]: ${f}`);
+    uploadFn(f);
+  });
+  monitor.on("changed", function(f, curr, prev) {
+    console.log(`[Modified]: ${f}`);
+    uploadFn(f);
+  });
+  monitor.on("removed", function(f, stat) {
+    console.log(`[Removed]: ${f}`);
+    uploadFn(f);
+  });
+});
+
+function uploadFn(f) {
+  // Handle file changes
+  const destPath = f.replace(config.srcPath, '');
+  var scpconf = {};
+  if (config.host) scpconf.host = config.host;
+  if (config.username) scpconf.username = config.username;
+  if (config.password) scpconf.password = config.password;
+  if (config.sshkey) scpconf.privateKey = config.sshkey;
+  scpconf.path = config.destPath + destPath;
+  client.scp(f, scpconf, function(err) {
+    if (err) {
+      console.error(`[Upload Error]: ${f}`);
+      console.error(err);
+    } else {
+      console.info(`[Upload Success]: ${f}->${scpconf.path}`);
+    }
+  })
+}

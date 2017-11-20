@@ -1,18 +1,24 @@
 {
-  "name": "watch",
-  "version": "0.0.0",
-  "private": true,
+  "name": "watch-scp",
+  "version": "0.0.1",
   "scripts": {
     "start": "node index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cosmozhang1995/watch-scp.git"
+  },
   "dependencies": {
-    "watch": "*",
-    "scp2": "*"
+    "scp2": "*",
+    "toml": "^2.3.3",
+    "watch": "*"
   },
   "devDependencies": {
-    "set-iterm2-badge": "*"
   },
   "description": "watch",
-  "author": "",
-  "license": "ISC"
+  "author": {
+    "name": "Cosmo Zhang",
+    "email": "cosmozhang1995@gmail.com"
+  },
+  "license": "MIT"
 }
