@@ -4,6 +4,9 @@
   "scripts": {
     "start": "node index.js"
   },
+  "bin": {
+    "watch-scp": "./index.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/cosmozhang1995/watch-scp.git"
