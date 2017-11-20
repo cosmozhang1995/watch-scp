@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /*
  * @Author: jade
  * @Date:   2016-08-09 22:59:16
@@ -9,7 +11,7 @@
 var client = require('scp2');
 var homedir = require('os').homedir();
 
-var configFilePath = "./scp.toml";
+var configFilePath = "./config.toml";
 var args = process.argv;
 if (args[0].match(/node$/)) args = args.slice(2);
 else args = args.slice(1);
