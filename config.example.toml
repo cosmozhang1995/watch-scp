@@ -1,8 +1,8 @@
-host = "162.105.250.69"
-username = "cosmo"
-# password = "cosmo"
-sshkey = "~/.ssh/id_rsa"
-srcPath = "/Users/cosmozhang/tmp/test"
-destPath = "/home/cosmo/tmp/test"
-ignore = "node_modules|hehe"
+host = "127.0.0.1"
+username = "username"
+password = "password" # Must be set if sshkey is missing
+sshkey = "~/.ssh/id_rsa" # Must be set if password is missing
+srcPath = "~/sync"
+destPath = "/home/username/sync"
+ignore = "" # A regular expression
 interval = 0.1

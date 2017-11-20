@@ -9,23 +9,35 @@
 
 'use strict';
 var client = require('scp2');
+var fs = require('fs');
 var homedir = require('os').homedir();
 
 var configFilePath = "./config.toml";
 var args = process.argv;
 if (args[0].match(/node$/)) args = args.slice(2);
 else args = args.slice(1);
+
 for (var i = 0; i < args.length; i++) {
   if (args[i] == "-c" || args[i] == "--config") {
     configFilePath = args[++i];
   }
 }
 
+configFilePath = configFilePath.replace(/^\./, process.cwd());
+
+if (args[0] == "init") {
+  var configContent = fs.readFileSync(__dirname + "/config.example.toml");
+  fs.writeFileSync(configFilePath, configContent);
+  console.log(`Generated config file: ${configFilePath}`);
+  process.exit(0);
+}
+
 const config = (function(path) {
-  var obj = require('fs').readFileSync(configFilePath.replace(/^\~/, homedir)).toString();
+  var obj = fs.readFileSync(configFilePath.replace(/^\~/, homedir)).toString();
   obj = require('toml').parse(obj);
   if (obj.ignore) obj.ignore = new RegExp(obj.ignore);
-  if (obj.sshkey) obj.sshkey = require('fs').readFileSync(obj.sshkey.replace(/^\~/, homedir)).toString();
+  if (obj.sshkey) obj.sshkey = fs.readFileSync(obj.sshkey.replace(/^\~/, homedir)).toString();
+  if (obj.srcPath) obj.srcPath = obj.srcPath.replace(/^\~/, homedir);
   return obj
 })(configFilePath);
 
